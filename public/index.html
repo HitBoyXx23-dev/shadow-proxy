@@ -9,10 +9,10 @@
 <body>
   <div class="container">
     <h1 class="title">🌑 Shadow Proxy</h1>
-    <p class="tagline">Step into the dark web... of light ⚡</p>
-    
+    <p class="tagline">A dark browser through the veil.</p>
+
     <form id="proxyForm" class="address-bar">
-      <input type="text" id="urlInput" placeholder="Enter URL (e.g. example.com)" />
+      <input type="text" id="urlInput" placeholder="Enter a URL (e.g. example.com)" />
       <button type="submit">Go</button>
     </form>
 
@@ -20,13 +20,12 @@
       <div class="iframe-container">
         <div class="loading-overlay" id="loadingOverlay">
           <div class="spinner"></div>
-          <p>Traversing the shadows...</p>
+          <p>Loading shadows...</p>
         </div>
-        <iframe id="proxyFrame" src=""></iframe>
+        <iframe id="proxyFrame"></iframe>
       </div>
     </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
