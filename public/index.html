@@ -7,16 +7,26 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="overlay"></div>
   <div class="container">
-    <h1 class="title">🌑 <span>Shadow Proxy</span></h1>
-    <p class="tagline">Browse the web through the shadows...</p>
-    <form id="proxyForm">
-      <input type="text" id="urlInput" placeholder="Enter URL (e.g. https://example.com)" />
-      <button type="submit">Enter the Shadow</button>
+    <h1 class="title">🌑 Shadow Proxy</h1>
+    <p class="tagline">Step into the dark web... of light ⚡</p>
+    
+    <form id="proxyForm" class="address-bar">
+      <input type="text" id="urlInput" placeholder="Enter URL (e.g. example.com)" />
+      <button type="submit">Go</button>
     </form>
-    <iframe id="proxyFrame" src=""></iframe>
+
+    <div class="browser-window">
+      <div class="iframe-container">
+        <div class="loading-overlay" id="loadingOverlay">
+          <div class="spinner"></div>
+          <p>Traversing the shadows...</p>
+        </div>
+        <iframe id="proxyFrame" src=""></iframe>
+      </div>
+    </div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
