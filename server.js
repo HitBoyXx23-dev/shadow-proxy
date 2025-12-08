@@ -1,54 +1,67 @@
-// 🌑 Shadow Proxy — Public Browser Edition (no key)
+// 🌑 Shadow Proxy — Clean + Working
 import express from "express";
 import axios from "axios";
 import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
-app.use(express.static("public"));
 
 function sanitizeURL(url) {
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    url = "https://" + url;
-  }
+  if (!url) return null;
+  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
   try {
-    new URL(url);
-    return url;
+    return new URL(url).toString();
   } catch {
     return null;
   }
 }
 
 app.get("/proxy", async (req, res) => {
-  const { url } = req.query;
-  const targetURL = sanitizeURL(url);
-  if (!targetURL) return res.status(400).send("⚠️ Invalid URL.");
+  const targetURL = sanitizeURL(req.query.url);
+  if (!targetURL) return res.status(400).send("Invalid URL");
 
   try {
-    const response = await axios.get(targetURL, {
-      responseType: "arraybuffer",
-      headers: { "User-Agent": "ShadowProxy/4.1" },
+    const response = await axios({
+      url: targetURL,
+      method: "get",
+      responseType: "stream",
       timeout: 15000,
+      maxRedirects: 5,
+      decompress: true,
+      headers: {
+        "User-Agent": "ShadowProxy/6.0",
+        "Accept-Encoding": "gzip, deflate"
+      }
     });
 
-    Object.entries(response.headers).forEach(([k, v]) => {
-      if (!["transfer-encoding", "content-encoding", "content-length"].includes(k))
-        res.setHeader(k, v);
-    });
-    res.send(response.data);
+    // Keep only safe/useful headers
+    const allowed = [
+      "content-type",
+      "content-language",
+      "cache-control",
+      "expires",
+      "last-modified",
+      "etag"
+    ];
+
+    for (const [key, value] of Object.entries(response.headers)) {
+      if (allowed.includes(key.toLowerCase())) {
+        res.setHeader(key, value);
+      }
+    }
+
+    // Mirror status code
+    res.status(response.status);
+
+    // Stream to client
+    response.data.pipe(res);
+
   } catch (err) {
-    res.status(500).send(`🌑 Proxy Error: ${err.message}`);
+    res.status(500).send("Proxy Error");
   }
 });
 
-app.get("*", (_, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🌑 Shadow Proxy running on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🌑 Shadow Proxy running on port ${PORT}`)
+);
